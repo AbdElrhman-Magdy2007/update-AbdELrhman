@@ -153,10 +153,13 @@ const logProduct = (projects: Project[], action: 'added' | 'updated' | 'removed'
 
 // Project Card Component
 const ProjectCard: React.FC<{ project: Project }> = React.memo(({ project }) => {
+  const [imgSrc, setImgSrc] = React.useState<string>(
+    project.image && project.image !== '/placeholder-image.png' ? project.image : DEFAULT_IMAGE
+  );
   const isRecent = new Date(project.createdAt).getTime() > Date.now() - 5 * 60 * 1000;
   const isValidDemoUrl = project.demoUrl && !project.demoUrl.includes('/admin/') && project.demoUrl !== 'https://full-stack-portfolio-a333-jq4tls75b.vercel.app/admin/menu-items/new';
   const isValidGithubUrl = project.githubUrl && !project.githubUrl.includes('/admin/');
-  const imageSrc = project.image && project.image !== '/placeholder-image.png' ? project.image : DEFAULT_IMAGE;
+  const imageSrc = imgSrc;
 
   return (
     <motion.div
@@ -169,15 +172,17 @@ const ProjectCard: React.FC<{ project: Project }> = React.memo(({ project }) => 
       aria-labelledby={`project-title-${project.id}`}
     >
       <div className="relative">
-        <div className="aspect-[4/3] overflow-hidden">
+        <div className="aspect-[4/3] md:aspect-video overflow-hidden rounded-t-2xl">
           <Image
             src={imageSrc}
             alt={`Screenshot of ${project.title} project`}
             width={600}
             height={400}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
             loading={project.featured ? 'eager' : 'lazy'}
             priority={project.featured}
+            onError={() => setImgSrc(DEFAULT_IMAGE)}
           />
         </div>
         <motion.div
@@ -216,7 +221,7 @@ const ProjectCard: React.FC<{ project: Project }> = React.memo(({ project }) => 
               animate="visible"
               whileHover="hover"
               whileTap="tap"
-              className="bg-gradient-to-r from-[#FF6AC2] to-[#7B61FF] text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-md"
+              className="bg-gradient-to-r from-[#14055e] to-[#14055e] text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-md"
             >
               {addon}
             </motion.span>

@@ -1,10 +1,8 @@
 {
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/profile/page": "app/profile/page.js",
   "/page": "app/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/projects/page": "app/projects/page.js",
   "/admin/page": "app/admin/page.js",
-  "/admin/menu-items/page": "app/admin/menu-items/page.js",
-  "/admin/users/page": "app/admin/users/page.js",
-  "/admin/chatuser/page": "app/admin/chatuser/page.js",
-  "/admin/categories/page": "app/admin/categories/page.js"
+  "/admin/menu-items/new/page": "app/admin/menu-items/new/page.js"
 }

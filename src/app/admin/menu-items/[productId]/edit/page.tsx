@@ -1,5 +1,3 @@
-"use server";
-
 import { cache } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "@/lib/prisma";
@@ -133,10 +131,10 @@ const getProduct = cache(async (productId: string): Promise<ProductWithRelations
 export default async function EditProductPage({
   params,
 }: {
-  params: Promise<{ productId: string }>;
+  params: { productId: string };
 }) {
   const requestId = generateRequestId();
-  const { productId } = await params;
+  const { productId } = params;
 
   if (process.env.NODE_ENV === "development") {
     console.log(`${LOG_PREFIX} [${requestId}] Rendering page for product ID: ${productId}`);

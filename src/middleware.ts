@@ -20,7 +20,8 @@ export default withAuth(
     try {
       const url = request.nextUrl.clone();
       const pathname = url.pathname;
-      const baseUrl = process.env.NEXTAUTH_URL || request.url.split('/').slice(0, 3).join('/');
+      // Always use the current request origin to avoid cross-env redirect issues
+      const baseUrl = url.origin;
       console.log("Pathname:", pathname);
 
       // إضافة رؤوس الأمان
@@ -52,7 +53,9 @@ export default withAuth(
       // إعادة توجيه المستخدمين غير المصادقين
       if (!isAuthenticated && isProtectedRoute) {
         const redirectUrl = new URL(`/${Routes.AUTH}${Pages.LOGIN}`, baseUrl);
-        redirectUrl.searchParams.set('callbackUrl', pathname);
+        // Preserve full path and query for proper post-login redirect
+        const callback = pathname + (url.search ?? "");
+        redirectUrl.searchParams.set('callbackUrl', callback);
         console.log("Redirecting to Login:", redirectUrl.toString());
         return NextResponse.redirect(redirectUrl);
       }
