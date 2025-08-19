@@ -151,11 +151,57 @@ const revalidatePaths = async (productId?: string): Promise<void> => {
     `/${Routes.MENU}`,
     `/${Routes.ADMIN}/${Pages.MENU_ITEMS}`,
     productId ? `/${Routes.ADMIN}/${Pages.MENU_ITEMS}/${productId}/${Pages.EDIT}` : null,
+    `/projects`,
     "/",
   ].filter(Boolean) as string[];
 
   console.log(`${LOG_PREFIX} Revalidating paths: ${paths.join(", ")}`);
   await Promise.all(paths.map((path) => revalidatePath(path)));
+};
+
+/**
+ * Reorders products by setting their `order` based on the provided array of IDs.
+ * The first ID gets order=1, the second gets order=2, etc.
+ */
+export const reorderProducts = async (
+  orderedIds: string[]
+): Promise<ActionResponse> => {
+  const requestId = crypto.randomUUID();
+  console.log(`${LOG_PREFIX} [${requestId}] Reordering products`, orderedIds);
+
+  try {
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+      return { status: 400, message: "orderedIds must be a non-empty array" };
+    }
+
+    // Ensure uniqueness
+    const uniqueIds = Array.from(new Set(orderedIds));
+    if (uniqueIds.length !== orderedIds.length) {
+      return { status: 400, message: "orderedIds contains duplicates" };
+    }
+
+    await db.$transaction(async (tx) => {
+      // Assign sequential order starting at 1
+      for (let index = 0; index < uniqueIds.length; index++) {
+        const id = uniqueIds[index];
+        await tx.product.update({
+          where: { id },
+          data: { order: index + 1 },
+        });
+      }
+    });
+
+    console.log(`${LOG_PREFIX} [${requestId}] Reorder completed`);
+    await revalidatePaths();
+
+    return { status: 200, message: "Order updated successfully" };
+  } catch (error) {
+    console.error(`${LOG_PREFIX} [${requestId}] Reorder failed`, error);
+    return {
+      status: 500,
+      message: `Failed to reorder products: ${error instanceof Error ? error.message : "Unknown error"}`,
+    };
+  }
 };
 
 /**
@@ -316,6 +362,10 @@ export const addProduct = async (
 
     // Create product and related entities in a transaction
     const product = await db.$transaction(async (tx) => {
+      // Get current max order to append new product at the end
+      const agg = await tx.product.aggregate({ _max: { order: true } });
+      const nextOrder = (agg._max.order ?? 0) + 1;
+
       const created = await tx.product.create({
         data: {
           name,
@@ -324,7 +374,7 @@ export const addProduct = async (
           categoryId,
           liveDemoLink: liveDemoLink || null,
           gitHubLink: validatedGitHubLink || null,
-          order: 0,
+          order: nextOrder,
         },
       });
 

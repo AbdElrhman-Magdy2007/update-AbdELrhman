@@ -17,7 +17,7 @@ interface CategoryWithProducts {
 const LOG_PREFIX = '[Products]';
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 0;
-const DEFAULT_SORT_BY = 'name';
+const DEFAULT_SORT_BY = 'order';
 const DEFAULT_ORDER = 'asc';
 const ERROR_MESSAGES = {
   INVALID_PAGE: 'Page number must be positive',
@@ -40,7 +40,7 @@ interface GetProductsOptions {
   page?: number;
   limit?: number;
   search?: string;
-  sortBy?: 'name' | 'createdAt' | 'liveDemoLink' | 'gitHubLink';
+  sortBy?: 'order' | 'name' | 'createdAt' | 'liveDemoLink' | 'gitHubLink';
   order?: 'asc' | 'desc';
 }
 
@@ -86,7 +86,7 @@ export const getAllProducts = cache(async (): Promise<ProductWithRelations[] | E
   try {
     const products = await db.product.findMany({
       include: productInclude,
-      orderBy: { name: 'asc' },
+      orderBy: { order: 'asc' },
     });
 
     console.log(`${LOG_PREFIX} [${requestId}]`, {
@@ -238,7 +238,7 @@ export const getProductsByCategory = cache(async (): Promise<CategoryWithProduct
       include: {
         products: {
           include: productInclude,
-          orderBy: { name: 'asc' },
+          orderBy: { order: 'asc' },
         },
       },
       orderBy: { order: 'asc' },
