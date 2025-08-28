@@ -14,6 +14,7 @@ import ContactForm from "../components/ContactForm";
 import Footer from "../components/Footer";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { LanguageProvider } from "../components/LanguageProvider";
+// import Abouts from "@/components/Abouts/Abouts";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,9 +33,18 @@ const Index = () => {
   >([]);
 
   useEffect(() => {
-    document.title = "Abdelrahman Magdy | Web Developer & Designer";
+    // Enhanced SEO and meta information
+    document.title = "Abdelrahman Magdy | Senior Full-Stack Developer & UI/UX Designer";
 
-    const timer = setTimeout(() => setIsLoading(false), 1500);
+    // Add meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content',
+        'Senior Full-Stack Developer with 5+ years of experience in React, Next.js, TypeScript, and Node.js. Creating exceptional digital experiences for startups and enterprises.'
+      );
+    }
+
+    const timer = setTimeout(() => setIsLoading(false), 2000);
 
     const handleMouseMove = (e: MouseEvent) => {
       const hero = document.getElementById("home");
@@ -76,48 +86,87 @@ const Index = () => {
           {isLoading ? (
             <motion.div
               key="loader"
-              className="fixed inset-0 z-50 bg-background flex items-center justify-center"
+              className="fixed inset-0 z-50 bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center"
               initial={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
             >
               <motion.div
-                className="relative"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
+                className="relative flex flex-col items-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <motion.div className="relative w-20 h-20">
+                <motion.div className="relative w-24 h-24 mb-6">
                   <motion.div
-                    className="w-20 h-20 border-4 border-primary rounded-full"
+                    className="w-24 h-24 border-4 rounded-full"
                     animate={{
                       rotate: 360,
                       borderColor: [
-                        "hsl(var(--primary))",
-                        "hsl(var(--accent))",
-                        "hsl(var(--primary))",
+                        "#3b82f6",
+                        "#8b5cf6",
+                        "#ec4899",
+                        "#3b82f6",
                       ],
                     }}
                     transition={{
                       repeat: Infinity,
-                      duration: 1.5,
+                      duration: 2,
                       ease: "linear",
+                    }}
+                    style={{
+                      borderImage: "linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899) 1",
                     }}
                   />
                   <motion.div
                     className="absolute inset-0 flex items-center justify-center"
-                    initial={{ scale: 0.7, opacity: 0 }}
+                    initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
                   >
                     <Image
                       src="/images/AbdELrhman.png"
-                      alt="Logo Icon"
-                      width={75}
-                      height={75}
-                      className="object-contain"
+                      alt="Abdelrahman Magdy"
+                      width={80}
+                      height={80}
+                      className="object-contain rounded-full"
                     />
                   </motion.div>
+                </motion.div>
+
+                <motion.div
+                  className="text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                >
+                  {/* <h2 className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-2">
+                    Abdelrahman Magdy
+                  </h2> */}
+                  {/* <p className="text-gray-400 text-sm">Loading portfolio...</p> */}
+                </motion.div>
+
+                <motion.div
+                  className="mt-4 flex space-x-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="w-2 h-2 bg-blue-500 rounded-full"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.5, 1, 0.5],
+                      }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 1.5,
+                        delay: i * 0.2,
+                      }}
+                    />
+                  ))}
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -149,12 +198,27 @@ const Index = () => {
 
               {/* Main Sections */}
               <main>
-                <Hero />
-                <About />
-                <Skills />
-                <Services />
-                <Projects />
-                <ContactForm />
+                <section id="home">
+                  <Hero />
+                </section>
+                {/* <section id="about" className="relative">
+                  <Abouts />
+                </section> */}
+                <section id="experience" className="relative bg-gradient-to-b from-gray-900 to-black">
+                  <About />
+                </section>
+                <section id="skills" className="relative">
+                  <Skills />
+                </section>
+                <section id="services" className="relative bg-gradient-to-b from-black to-gray-900">
+                  <Services />
+                </section>
+                <section id="projects" className="relative">
+                  <Projects />
+                </section>
+                <section id="contact" className="relative bg-gradient-to-b from-gray-900 to-black">
+                  <ContactForm />
+                </section>
               </main>
 
               {/* Footer */}

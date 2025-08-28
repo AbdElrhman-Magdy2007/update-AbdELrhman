@@ -1,185 +1,239 @@
-/* Professional Sticky Card Stack Styles - Ultimate Polish */
+/* Minimal ScrollStack Animation Foundation */
 :root {
-  --card-transition-duration: 0.5s;
-  --card-transition-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Core Animation Properties */
+  --scroll-stack-duration: 0.6s;
+  --scroll-stack-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --scroll-stack-scale-min: 0.85;
+  --scroll-stack-scale-max: 1.0;
+  --scroll-stack-opacity-min: 0.4;
+  --scroll-stack-opacity-max: 1.0;
+
+  /* Visual Properties */
+  /* --scroll-stack-bg: rgba(255, 255, 255, 0.05); */
+  /* --scroll-stack-border: rgba(255, 255, 255, 0.1); */
+  /* --scroll-stack-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25); */
+  --scroll-stack-radius: 24px;
+
+  /* Performance Properties */
+  --scroll-stack-blur-subtle: 1px;
 }
 
+/* Container Styles */
 .scroll-stack-container {
   position: relative;
+  contain: layout style paint;
 }
 
+/* Card Wrapper */
 .scroll-stack-card-wrapper {
   height: 100vh;
   position: relative;
-  perspective: 2000px;
-  transition: perspective 0.8s var(--card-transition-easing);
-}
-.scroll-stack-card-wrapper:hover {
-  perspective: 2500px;
+  perspective: 1000px;
 }
 
-@keyframes snap-effect {
-  0%,
-  100% {
-    transform: translateY(-50%) scale(var(--scale));
+/* Minimal Animation Keyframes */
+@keyframes scroll-stack-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8) translateY(20px);
   }
-  50% {
-    transform: translateY(-50%) scale(calc(var(--scale) * 1.025));
+
+  to {
+    opacity: var(--scroll-stack-opacity-min);
+    transform: translateY(-50%) scale(var(--scroll-stack-scale-min)) translateY(0);
   }
 }
 
-.scroll-stack-card.is-snapping {
-  animation: snap-effect 0.4s var(--card-transition-easing);
+@keyframes scroll-stack-focus {
+  from {
+    transform: translateY(-50%) scale(var(--scroll-stack-scale-min));
+    opacity: var(--scroll-stack-opacity-min);
+  }
+
+  to {
+    transform: translateY(-50%) scale(var(--scroll-stack-scale-max));
+    opacity: var(--scroll-stack-opacity-max);
+  }
 }
 
+@keyframes scroll-stack-content-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Main Card Styles */
 .scroll-stack-card {
-  --scale: 0;
-  --opacity: 0;
-  --rotate-x: 0deg;
-  --rotate-y: 0deg;
-  --mouse-x: 50%;
-  --mouse-y: 50%;
+  /* CSS Custom Properties for Dynamic Animation */
+  --scale: 0.85;
+  --opacity: 0.4;
+  --blur: 0px;
 
+  /* Positioning */
   position: sticky;
   top: 50%;
-  transform: translateY(-50%) scale(var(--scale)) rotateX(var(--rotate-x))
-    rotateY(var(--rotate-y));
+  transform: translateY(-50%) scale(var(--scale));
   opacity: var(--opacity);
-  transform-style: preserve-3d;
 
-  width: 90%;
-  max-width: 650px;
-  height: 70vh;
+  /* Dimensions */
+  width: 75%;
+  max-width: 480px;
+  height: 55vh;
   margin: 0 auto;
 
-  background-color: #22252a;
-  background-image: linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.035) 0%,
-      rgba(0, 0, 0, 0.25) 100%
-    ),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.035'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  /* Visual Styling */
+  background: var(--scroll-stack-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: var(--scroll-stack-radius);
+  border: 1px solid var(--scroll-stack-border);
+  box-shadow: var(--scroll-stack-shadow);
 
-  border-radius: 2.25rem;
-  box-shadow: 0px 2.8px 5.3px rgba(0, 0, 0, 0.07),
-    0px 9.3px 17.9px rgba(0, 0, 0, 0.05), 0px 42px 80px rgba(0, 0, 0, 0.06),
-    inset 0 1px 1px rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  padding: 3rem;
+  /* Layout */
+  padding: 2rem;
   color: white;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
 
-  /* Physics-based Transition */
+  /* Performance Optimizations */
   will-change: transform, opacity;
-  transition: transform var(--transition-duration, 0.5s)
-    var(--card-transition-easing);
+  transform-origin: center center;
+  backface-visibility: hidden;
+
+  /* Smooth Transitions */
+  transition:
+    transform var(--scroll-stack-duration) var(--scroll-stack-easing),
+    opacity var(--scroll-stack-duration) var(--scroll-stack-easing),
+    filter var(--scroll-stack-duration) var(--scroll-stack-easing);
 }
 
-.scroll-stack-card::before,
-.scroll-stack-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  z-index: -1;
-  transition: opacity 0.6s var(--card-transition-easing);
-  opacity: 0;
-}
-/* Chromatic Aberration Glow & Shine */
-.scroll-stack-card::before {
-  /* Main glow + chromatic aberration */
-  background: radial-gradient(
-      circle at 50% 50%,
-      rgba(168, 85, 247, 0.15) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at 52% 51%,
-      rgba(244, 114, 182, 0.1) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      circle at 48% 49%,
-      rgba(6, 182, 212, 0.1) 0%,
-      transparent 70%
-    );
-}
-.scroll-stack-card::after {
-  background: radial-gradient(
-    450px circle at var(--mouse-x) var(--mouse-y),
-    rgba(255, 255, 255, 0.15),
-    transparent 55%
-  );
-  mix-blend-mode: soft-light;
-}
-.scroll-stack-card.is-active::before,
-.scroll-stack-card.is-active:hover::after {
-  opacity: 1;
+/* Card States */
+.scroll-stack-card-entering {
+  animation: scroll-stack-enter var(--scroll-stack-duration) var(--scroll-stack-easing) forwards;
 }
 
-.scroll-stack-card h2,
-.scroll-stack-card p {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s 0.2s var(--card-transition-easing),
-    transform 0.8s 0.2s var(--card-transition-easing);
-}
-.scroll-stack-card.is-active h2 {
-  transition-delay: 0.25s;
-}
-.scroll-stack-card.is-active p {
-  transition-delay: 0.35s;
-}
-.scroll-stack-card.is-active h2,
-.scroll-stack-card.is-active p {
-  opacity: 1;
-  transform: translateY(0);
+.scroll-stack-card-active {
+  --scale: 1.0;
+  --opacity: 1.0;
 }
 
-.scroll-stack-card h2 {
-  font-size: 2.6rem;
-  font-weight: 800;
-  background: linear-gradient(120deg, #ffffff 0%, #e0e0e0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 1rem;
+.scroll-stack-card-exiting {
+  --scale: 0.9;
+  --opacity: 0.6;
 }
 
-.scroll-stack-card p {
-  font-size: 1.15rem;
-  color: #d0d5e0;
-  max-width: 85%;
-  line-height: 1.8;
-}
-
-body::-webkit-scrollbar {
-  width: 9px;
-}
-body::-webkit-scrollbar-track {
-  background: #1a1c20;
-}
-body::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.12);
-  border-radius: 9px;
-  border: 2px solid #1a1c20;
-}
-body::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.22);
-}
+/* Content Styles */
 .card-content {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  opacity: 0.8;
+  transform: translateY(0);
+  transition:
+    opacity var(--scroll-stack-duration) var(--scroll-stack-easing),
+    transform var(--scroll-stack-duration) var(--scroll-stack-easing);
   will-change: opacity, transform;
 }
 
-.scroll-stack-card.is-active .card-content {
+.scroll-stack-card-active .card-content {
   opacity: 1;
-  transform: translateY(0);
+  animation: scroll-stack-content-reveal 0.4s var(--scroll-stack-easing) forwards;
+}
+
+/* Typography */
+.scroll-stack-card h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  /* background: linear-gradient(120deg, #ffffff 0%, #e0e0e0 100%); */
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.scroll-stack-card p {
+  font-size: 1.05rem;
+  color: #d0d5e0;
+  max-width: 90%;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+/* Minimal Scrollbar */
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  /* background: rgba(255, 255, 255, 0.2); */
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  /* background: rgba(255, 255, 255, 0.4); */
+}
+
+/* Focus States for Accessibility */
+.scroll-stack-card:focus-visible {
+  /* outline: 2px solid rgba(255, 255, 255, 0.6); */
+  outline-offset: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .scroll-stack-card {
+    width: 85%;
+    height: 50vh;
+    padding: 1.5rem;
+  }
+
+  .scroll-stack-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .scroll-stack-card p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-stack-card {
+    width: 90%;
+    height: 45vh;
+    padding: 1rem;
+  }
+
+  .scroll-stack-card h2 {
+    font-size: 1.6rem;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+
+  .scroll-stack-card,
+  .card-content {
+    animation: none !important;
+    transition: opacity 0.3s ease !important;
+  }
+
+  .scroll-stack-card {
+    transform: translateY(-50%) scale(var(--scale)) !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    transition: none;
+  }
 }

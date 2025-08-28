@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useCallback, useMemo } from "react";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 
-// Interface for form data
+// ================== Interfaces ==================
 interface FormData {
   name: string;
   email: string;
@@ -15,56 +15,51 @@ interface FormData {
   honeypot: string;
 }
 
-// Particle Background Component
+interface Sparkle {
+  id: number;
+  x: number;
+  y: number;
+}
+
+// ================== Particle Background ==================
 const COLORS = ["#5D5FEF", "#EFA6BE", "#F96A6A"];
 
 const ParticleBackground: React.FC = () => {
+  const shouldReduceMotion = useReducedMotion();
+
+  // Dynamic particle count based on screen size
+  const particleCount =
+    typeof window !== "undefined"
+      ? window.innerWidth < 640
+        ? 10 // Mobile
+        : window.innerWidth < 1024
+          ? 18 // Tablet
+          : 28 // Desktop
+      : 20;
+
   const particles = useMemo(
     () =>
-      Array.from({ length: 30 }).map((_, i) => ({
+      Array.from({ length: particleCount }).map((_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * 8 + 6,
-        duration: Math.random() * 8 + 4,
-        delay: Math.random() * 3,
-        opacity: Math.random() * 0.4 + 0.2,
+        size: Math.random() * 6 + 4,
+        duration: Math.random() * 6 + 4,
+        delay: Math.random() * 2,
+        opacity: Math.random() * 0.3 + 0.2,
         color: COLORS[i % COLORS.length],
       })),
-    []
+    [particleCount]
   );
 
-  const particleVariants: Variants = {
-    animate: (i: number) => ({
-      x: [particles[i].x, particles[i].x + (Math.random() * 80 - 40), particles[i].x],
-      y: [particles[i].y, particles[i].y + (Math.random() * 80 - 40), particles[i].y],
-      opacity: [0, particles[i].opacity, 0],
-      scale: [0, 1.3, 0],
-      rotate: [0, 360],
-      transition: {
-        duration: particles[i].duration,
-        delay: particles[i].delay,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
-    }),
-    pulse: {
-      scale: [1, 1.4, 1],
-      opacity: [0.2, 0.5, 0.2],
-      transition: {
-        duration: 5,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
-    },
-  };
+  if (shouldReduceMotion) return null;
 
   return (
     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full blur-sm"
+          className="absolute rounded-full blur-[2px] will-change-transform"
           style={{
             width: p.size,
             height: p.size,
@@ -72,54 +67,51 @@ const ParticleBackground: React.FC = () => {
             top: `${p.y}%`,
             background: p.color,
           }}
-          variants={particleVariants}
-          animate={["animate", "pulse"]}
-          custom={p.id}
-        />
-      ))}
-      {Array.from({ length: 3 }).map((_, i) => (
-        <motion.div
-          key={`pulse-circle-${i}`}
-          className="absolute rounded-full border-4 md:border-6 shadow-2xl"
-          style={{
-            width: 200 + i * 120,
-            height: 200 + i * 120,
-            top: `${30 + i * 10}%`,
-            left: `${35 + i * 12}%`,
-            transform: "translate(-50%, -50%)",
-            borderColor: COLORS[i % COLORS.length],
-            boxShadow: `0 0 50px ${COLORS[i % COLORS.length]}44`,
-          }}
           animate={{
-            scale: [1, 1.6, 1],
-            opacity: [0.3, 0.1, 0.3],
+            x: [p.x, p.x + (Math.random() * 50 - 25), p.x],
+            y: [p.y, p.y + (Math.random() * 50 - 25), p.y],
+            opacity: [0, p.opacity, 0],
+            scale: [0.8, 1.2, 0.8],
           }}
           transition={{
-            duration: 7 + i * 2,
+            duration: p.duration,
+            delay: p.delay,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
       ))}
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(45deg, transparent, ${COLORS[0]}22, transparent)`,
-        }}
-        animate={{
-          opacity: [0.05, 0.2, 0.05],
-          x: [-50, 50, -50],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+
+      {/* Circles Background */}
+      {Array.from({ length: 3 }).map((_, i) => (
+        <motion.div
+          key={`pulse-${i}`}
+          className="absolute rounded-full border-2 md:border-4 shadow-xl"
+          style={{
+            width: 160 + i * 100,
+            height: 160 + i * 100,
+            top: `${30 + i * 8}%`,
+            left: `${40 + i * 10}%`,
+            transform: "translate(-50%, -50%)",
+            borderColor: COLORS[i % COLORS.length],
+            boxShadow: `0 0 40px ${COLORS[i % COLORS.length]}44`,
+          }}
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.25, 0.1, 0.25],
+          }}
+          transition={{
+            duration: 6 + i * 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
     </div>
   );
 };
 
+// ================== Contact Form ==================
 const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -127,12 +119,14 @@ const ContactForm: React.FC = () => {
     message: "",
     honeypot: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | "invalid" | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "success" | "error" | "invalid" | null
+  >(null);
   const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [sparkles, setSparkles] = useState<Sparkle[]>([]);
 
-  // Form validation
+  // Validation
   const validateForm = useCallback(() => {
     const newErrors: Partial<FormData> = {};
 
@@ -142,7 +136,7 @@ const ContactForm: React.FC = () => {
       newErrors.name = "Name must be at least 2 characters";
     }
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(formData.email)) {
@@ -159,7 +153,7 @@ const ContactForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  // Handle form input changes
+  // Handle Input
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
@@ -169,23 +163,24 @@ const ContactForm: React.FC = () => {
     []
   );
 
-  // Create sparkle effect
+  // Sparkle effect
   const createSparkle = useCallback((x: number, y: number) => {
     const id = Date.now();
     setSparkles((prev) => [
       ...prev,
       { id, x: x + Math.random() * 10 - 5, y: y + Math.random() * 10 - 5 },
     ]);
-    setTimeout(() => setSparkles((prev) => prev.filter((s) => s.id !== id)), 600);
+    setTimeout(
+      () => setSparkles((prev) => prev.filter((s) => s.id !== id)),
+      600
+    );
   }, []);
 
-  // Handle form submission
+  // Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.honeypot) {
-      return;
-    }
+    if (formData.honeypot) return;
 
     if (!validateForm()) {
       setSubmitStatus("invalid");
@@ -201,20 +196,13 @@ const ContactForm: React.FC = () => {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) {
-        let message = "Failed to send message";
-        try {
-          const data = await res.json();
-          message = data?.error || message;
-        } catch {}
-        throw new Error(message);
-      }
+      if (!res.ok) throw new Error("Failed to send");
 
       setSubmitStatus("success");
       setFormData({ name: "", email: "", message: "", honeypot: "" });
       setErrors({});
     } catch (error) {
-      console.error("Submission error:", error);
+      console.error(error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -222,7 +210,7 @@ const ContactForm: React.FC = () => {
     }
   };
 
-  // Animation variants
+  // Animations
   const containerVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
@@ -238,8 +226,9 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="relative min-h-screen flex items-center justify-center bg-black py-20 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center bg-black py-20 overflow-hidden">
       <ParticleBackground />
+
       <motion.div
         className="relative z-10 w-full max-w-2xl mx-auto px-4 sm:px-6"
         variants={containerVariants}
@@ -247,21 +236,32 @@ const ContactForm: React.FC = () => {
         animate="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
+        {/* Heading */}
         <motion.div variants={itemVariants} className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Get in Touch</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Get in Touch
+          </h2>
           <p className="text-lg text-gray-300 max-w-xl mx-auto">
-            Have a project in mind or want to collaborate? Let's connect and bring your ideas to life.
+            Have a project in mind or want to collaborate? Let’s connect and
+            bring your ideas to life.
           </p>
           <div className="h-1 w-32 bg-gradient-to-r from-[#5D5FEF] to-[#EFA6BE] mx-auto mt-6 rounded"></div>
         </motion.div>
 
+        {/* Form */}
         <motion.div variants={itemVariants}>
           <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-[0_0_20px_rgba(93,95,239,0.3)] transition-all duration-300">
             <CardContent className="p-6 sm:p-8">
-              <h3 className="text-2xl font-semibold text-white mb-6">Send a Message</h3>
+              <h3 className="text-2xl font-semibold text-white mb-6">
+                Send a Message
+              </h3>
               <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                {/* Name */}
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-2">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-200 mb-2"
+                  >
                     Your Name
                   </label>
                   <Input
@@ -271,15 +271,13 @@ const ContactForm: React.FC = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className={`w-full bg-white/5 border ${errors.name ? "border-red-500" : "border-white/10"} text-white placeholder-gray-400 focus:border-[#5D5FEF] focus:ring-[#5D5FEF] transition-all duration-300`}
-                    aria-invalid={errors.name ? "true" : "false"}
-                    aria-describedby={errors.name ? "name-error" : undefined}
+                    className={`w-full bg-white/5 border ${errors.name ? "border-red-500" : "border-white/10"
+                      } text-white placeholder-gray-400 focus:border-[#5D5FEF] focus:ring-[#5D5FEF] transition-all duration-300`}
                   />
                   {errors.name && (
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      id="name-error"
                       className="text-red-400 text-sm mt-1"
                     >
                       {errors.name}
@@ -287,8 +285,12 @@ const ContactForm: React.FC = () => {
                   )}
                 </div>
 
+                {/* Email */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-200 mb-2"
+                  >
                     Your Email
                   </label>
                   <Input
@@ -299,15 +301,13 @@ const ContactForm: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className={`w-full bg-white/5 border ${errors.email ? "border-red-500" : "border-white/10"} text-white placeholder-gray-400 focus:border-[#5D5FEF] focus:ring-[#5D5FEF] transition-all duration-300`}
-                    aria-invalid={errors.email ? "true" : "false"}
-                    aria-describedby={errors.email ? "email-error" : undefined}
+                    className={`w-full bg-white/5 border ${errors.email ? "border-red-500" : "border-white/10"
+                      } text-white placeholder-gray-400 focus:border-[#5D5FEF] focus:ring-[#5D5FEF] transition-all duration-300`}
                   />
                   {errors.email && (
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      id="email-error"
                       className="text-red-400 text-sm mt-1"
                     >
                       {errors.email}
@@ -315,8 +315,12 @@ const ContactForm: React.FC = () => {
                   )}
                 </div>
 
+                {/* Message */}
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-200 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-200 mb-2"
+                  >
                     Your Message
                   </label>
                   <Textarea
@@ -327,15 +331,13 @@ const ContactForm: React.FC = () => {
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    className={`w-full bg-white/5 border ${errors.message ? "border-red-500" : "border-white/10"} text-white placeholder-gray-400 focus:border-[#5D5FEF] focus:ring-[#5D5FEF] transition-all duration-300 resize-y`}
-                    aria-invalid={errors.message ? "true" : "false"}
-                    aria-describedby={errors.message ? "message-error" : undefined}
+                    className={`w-full bg-white/5 border ${errors.message ? "border-red-500" : "border-white/10"
+                      } text-white placeholder-gray-400 focus:border-[#5D5FEF] focus:ring-[#5D5FEF] transition-all duration-300 resize-y`}
                   />
                   {errors.message && (
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      id="message-error"
                       className="text-red-400 text-sm mt-1"
                     >
                       {errors.message}
@@ -343,6 +345,7 @@ const ContactForm: React.FC = () => {
                   )}
                 </div>
 
+                {/* Honeypot */}
                 <div className="hidden">
                   <input
                     type="text"
@@ -354,6 +357,7 @@ const ContactForm: React.FC = () => {
                   />
                 </div>
 
+                {/* Submit */}
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-[#5D5FEF] to-[#EFA6BE] hover:from-[#4B4CCB] hover:to-[#D68AA6] text-white font-semibold py-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -387,16 +391,16 @@ const ContactForm: React.FC = () => {
                   )}
                 </Button>
 
+                {/* Status Messages */}
                 {submitStatus === "success" && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg text-center"
                   >
-                    Message sent successfully! I'll respond soon.
+                    Message sent successfully! I’ll respond soon.
                   </motion.div>
                 )}
-
                 {submitStatus === "error" && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -406,7 +410,6 @@ const ContactForm: React.FC = () => {
                     Error sending message. Please try again later.
                   </motion.div>
                 )}
-
                 {submitStatus === "invalid" && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -422,6 +425,7 @@ const ContactForm: React.FC = () => {
         </motion.div>
       </motion.div>
 
+      {/* Sparkle Effects */}
       {sparkles.map((sparkle) => (
         <motion.div
           key={sparkle.id}

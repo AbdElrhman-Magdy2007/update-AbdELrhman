@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef, createContext, useContext, useTransition } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { ExternalLink, Github, Search, X, AlertCircle, RefreshCw } from 'lucide-react';
+import { ExternalLink, Github, Search, X, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +11,7 @@ import { getProductsByCategory } from '../server/db/products';
 import { debounce } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
+import ScrollManager from '@/components/ScrollManager';
 import 'tailwindcss/tailwind.css';
 
 // Define data types
@@ -233,7 +234,7 @@ const ProjectCard: React.FC<{ project: Project }> = React.memo(({ project }) => 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <motion.a
-                    href={project.demoUrl}
+                    href={project.demoUrl || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
                     variants={buttonVariants}
@@ -257,7 +258,7 @@ const ProjectCard: React.FC<{ project: Project }> = React.memo(({ project }) => 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <motion.a
-                    href={project.githubUrl}
+                    href={project.githubUrl || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
                     variants={buttonVariants}
@@ -353,12 +354,40 @@ const ProjectsShowcase: React.FC = () => {
   const [categories, setCategories] = useState<CategoryWithProducts[]>([]);
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [isPending, startTransition] = useTransition();
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const previousProjectsRef = useRef<Project[]>([]);
   const isPollingActive = useRef(true);
   const lastFetchTimeRef = useRef<number>(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const scrollPositionRef = useRef<number>(0);
+
+  // Mobile detection and hydration
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log(`${LOG_PREFIX} [MOBILE DETECTION] Mobile detected: ${mobile}, Screen width: ${window.innerWidth}`);
+      setIsMobile(mobile);
+      setIsHydrated(true);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // Fallback timer for mobile devices to ensure loading state doesn't persist
+    const fallbackTimer = setTimeout(() => {
+      if (isMobile && isLoading) {
+        console.log(`${LOG_PREFIX} [MOBILE FALLBACK] Forcing loading state to false after timeout`);
+        setIsLoading(false);
+      }
+    }, 5000);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      clearTimeout(fallbackTimer);
+    };
+  }, [isMobile, isLoading]);
 
   // Preserve scroll position
   const saveScrollPosition = useCallback(() => {
@@ -389,20 +418,44 @@ const ProjectsShowcase: React.FC = () => {
     });
   }, []);
 
-  // Debounced state update
-  const updateProjectsData = useMemo(
-    () =>
-      debounce((newCategories: CategoryWithProducts[], newProjects: Project[]) => {
-        startTransition(() => {
-          if (!areProjectsEqual(newProjects, projectsData)) {
-            setCategories(newCategories);
-            setProjectsData(newProjects);
-            previousProjectsRef.current = newProjects;
-            setError(null);
+  // Enhanced state update with mobile-aware logic
+  const updateProjectsData = useCallback(
+    (newCategories: CategoryWithProducts[], newProjects: Project[], immediate = false) => {
+      console.log(`${LOG_PREFIX} [STATE UPDATE] Updating projects data`, {
+        newProjectsCount: newProjects.length,
+        categoriesCount: newCategories.length,
+        immediate,
+        currentProjectsCount: projectsData.length,
+        timestamp: new Date().toISOString()
+      });
+
+      const updateFn = () => {
+        if (!areProjectsEqual(newProjects, projectsData) || immediate) {
+          console.log(`${LOG_PREFIX} [STATE UPDATE] Applying state changes`);
+          setCategories(newCategories);
+          setProjectsData(newProjects);
+          previousProjectsRef.current = newProjects;
+          setError(null);
+          setIsLoading(false);
+          
+          // Restore scroll position after a brief delay to ensure DOM is updated
+          setTimeout(() => {
             restoreScrollPosition();
-          }
-        });
-      }, 500),
+          }, 100);
+        } else {
+          console.log(`${LOG_PREFIX} [STATE UPDATE] No changes detected, skipping update`);
+          setIsLoading(false);
+        }
+      };
+
+      if (immediate) {
+        // For mobile or critical updates, apply immediately without debouncing
+        updateFn();
+      } else {
+        // Use transition for non-critical updates
+        startTransition(updateFn);
+      }
+    },
     [projectsData, areProjectsEqual, restoreScrollPosition]
   );
 
@@ -479,7 +532,8 @@ const ProjectsShowcase: React.FC = () => {
           });
         }
 
-        updateProjectsData(mappedCategories, newProjects);
+        // Use immediate update for mobile devices to prevent race conditions
+        updateProjectsData(mappedCategories, newProjects, isMobile);
         lastFetchTimeRef.current = now;
       } catch (error: any) {
         if (error.name === 'AbortError') {
@@ -502,7 +556,7 @@ const ProjectsShowcase: React.FC = () => {
             duration: 5000,
             className: 'bg-red-500 text-white',
           });
-          updateProjectsData(categories, projectsData);
+          updateProjectsData(categories, projectsData, true);
         }
       } finally {
         if (retryCount === 0 || !error) {
@@ -510,7 +564,7 @@ const ProjectsShowcase: React.FC = () => {
         }
       }
     },
-    [updateProjectsData, projectsData, categories, error]
+    [updateProjectsData, projectsData, categories, error, isMobile]
   );
 
   // Polling with visibility awareness
@@ -556,15 +610,33 @@ const ProjectsShowcase: React.FC = () => {
     }
   }, []);
 
-  // Filter projects
+  // Enhanced filter projects with mobile debugging
   const filteredProjects = useMemo(() => {
+    console.log(`${LOG_PREFIX} [FILTERING] Starting filter process`, {
+      totalProjects: projectsData.length,
+      selectedCategory,
+      searchQuery,
+      isMobile,
+      isHydrated,
+      timestamp: new Date().toISOString()
+    });
+
     let projects = projectsData;
+    
+    // Category filtering
     if (selectedCategory !== 'All') {
       projects = projects.filter(project => project.category === selectedCategory);
+      console.log(`${LOG_PREFIX} [FILTERING] After category filter (${selectedCategory}): ${projects.length} projects`);
     }
-    if (!searchQuery.trim()) return projects;
+    
+    // Search filtering
+    if (!searchQuery.trim()) {
+      console.log(`${LOG_PREFIX} [FILTERING] No search query, returning ${projects.length} projects`);
+      return projects;
+    }
+    
     const keywords = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
-    return projects.filter(project => {
+    const searchFiltered = projects.filter(project => {
       const haystack = [
         project.title,
         project.description,
@@ -578,7 +650,10 @@ const ProjectsShowcase: React.FC = () => {
         haystack.split(' ').some(word => word.startsWith(kw) || word.includes(kw))
       );
     });
-  }, [projectsData, selectedCategory, searchQuery]);
+    
+    console.log(`${LOG_PREFIX} [FILTERING] After search filter: ${searchFiltered.length} projects`);
+    return searchFiltered;
+  }, [projectsData, selectedCategory, searchQuery, isMobile, isHydrated]);
 
   // Keyboard navigation for search focus
   useEffect(() => {
@@ -592,7 +667,21 @@ const ProjectsShowcase: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  if (isLoading || isPending) {
+  // Enhanced loading condition with mobile awareness
+  const shouldShowSkeleton = !isHydrated || (isLoading && projectsData.length === 0) || (!isMobile && isPending);
+  
+  console.log(`${LOG_PREFIX} [RENDER] Render decision`, {
+    shouldShowSkeleton,
+    isHydrated,
+    isLoading,
+    isPending,
+    isMobile,
+    projectsDataLength: projectsData.length,
+    filteredProjectsLength: filteredProjects.length,
+    timestamp: new Date().toISOString()
+  });
+
+  if (shouldShowSkeleton) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl w-full px-4">
@@ -606,7 +695,13 @@ const ProjectsShowcase: React.FC = () => {
 
   return (
     <ProjectsContext.Provider value={{ selectedCategory, setSelectedCategory, searchQuery, setSearchQuery }}>
-      <section className="py-16 bg-black">
+      <ScrollManager 
+        showProgressBar={true}
+        showScrollToTop={true}
+        scrollToTopOffset={300}
+        progressBarHeight={3}
+      />
+      <section className="py-16 projects-scrollbar">
         <div className="container mx-auto px-4">
           <motion.div
             initial="hidden"

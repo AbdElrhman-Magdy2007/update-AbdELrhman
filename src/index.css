@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+@import './styles/scrollbar.css';
 
 @tailwind base;
 @tailwind components;
@@ -8,25 +9,33 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;              /* Pure Black */
-    --foreground: 0 0% 100%;           /* White */
+    --background: 0 0% 0%;
+    /* Pure Black */
+    --foreground: 0 0% 100%;
+    /* White */
 
-    --card: 240 6% 10%;                /* Very Dark Gray/Navy */
-    --card-foreground: 0 0% 100%;      /* White */
+    --card: 240 6% 10%;
+    /* Very Dark Gray/Navy */
+    --card-foreground: 0 0% 100%;
+    /* White */
 
     --popover: 240 6% 12%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 246 100% 60%;           /* #3A29FF */
+    --primary: 246 100% 60%;
+    /* #3A29FF */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 340 100% 75%;         /* #FF94B4 */
+    --secondary: 340 100% 75%;
+    /* #FF94B4 */
     --secondary-foreground: 0 0% 100%;
 
-    --destructive: 0 100% 60%;         /* #FF3232 */
+    --destructive: 0 100% 60%;
+    /* #FF3232 */
     --destructive-foreground: 0 0% 100%;
 
-    --muted: 240 4% 20%;               /* Muted Gray */
+    --muted: 240 4% 20%;
+    /* Muted Gray */
     --muted-foreground: 240 5% 65%;
 
     --accent: 246 100% 60%;
@@ -73,14 +82,256 @@
     @apply bg-background text-foreground font-sans;
   }
 }
-/* في globals.css أو tailwind config */
+
+/* Custom Professional Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7B61FF 0%, #FF6AC2 50%, #38BDF8 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #6B51E6 0%, #E55AA8 50%, #2BA3D4 100%);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(123, 97, 255, 0.4);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #5B41D6 0%, #D54A98 50%, #1B93C4 100%);
+  transform: scale(0.95);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #7B61FF rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Scrollbar for specific elements */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(45deg, #7B61FF, #FF6AC2);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #6B51E6, #E55AA8);
+  box-shadow: 0 0 10px rgba(123, 97, 255, 0.3);
+}
+
+/* Thin Scrollbar for mobile */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(123, 97, 255, 0.6);
+  border-radius: 2px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(123, 97, 255, 0.8);
+}
+
+/* Animated Scrollbar */
+.animated-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7B61FF 0%, #FF6AC2 50%, #38BDF8 100%);
+  background-size: 200% 200%;
+  animation: scrollbarGradient 3s ease infinite;
+}
+
+@keyframes scrollbarGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Glow Effect Scrollbar */
+.glow-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7B61FF, #FF6AC2);
+  box-shadow: 
+    0 0 10px rgba(123, 97, 255, 0.5),
+    0 0 20px rgba(255, 106, 194, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glow-scrollbar::-webkit-scrollbar-thumb:hover {
+  box-shadow: 
+    0 0 15px rgba(123, 97, 255, 0.7),
+    0 0 30px rgba(255, 106, 194, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}/* Scro
+llbar Utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-default {
+  -ms-overflow-style: auto;
+  scrollbar-width: auto;
+}
+
+.scrollbar-default::-webkit-scrollbar {
+  display: block;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar for Dark Theme */
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7B61FF 0%, #FF6AC2 50%, #38BDF8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar for specific containers */
+.projects-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.projects-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+
+.projects-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #7B61FF, #38BDF8);
+  border-radius: 8px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.projects-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #6B51E6, #2BA3D4);
+  box-shadow: 0 0 12px rgba(123, 97, 255, 0.4);
+}
+
+/* Responsive Scrollbar */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (max-width: 480px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Scrollbar with Progress Indicator */
+.progress-scrollbar {
+  position: relative;
+}
+
+.progress-scrollbar::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--scroll-progress, 0%);
+  height: 3px;
+  background: linear-gradient(90deg, #7B61FF, #FF6AC2, #38BDF8);
+  z-index: 9999;
+  transition: width 0.1s ease;
+}
+
+/* Scrollbar Animation on Scroll */
+@keyframes scrollPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.pulse-scrollbar::-webkit-scrollbar-thumb {
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* Custom Scrollbar for Code Blocks */
+.code-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.code-scrollbar::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.code-scrollbar::-webkit-scrollbar-thumb {
+  background: #7B61FF;
+  border-radius: 4px;
+}
+
+.code-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6B51E6;
+}@keyframes pulseParticle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
+}
+
+.animate-pulseParticle {
+  animation: pulseParticle 5s ease-in-out infinite;
 }

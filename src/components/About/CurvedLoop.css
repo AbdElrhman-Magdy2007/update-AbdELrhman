@@ -1,50 +1,64 @@
-.curved-loop-jacket {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .curved-loop-svg {
-    user-select: none;
-    width: 100%;
-    aspect-ratio: 100 / 12;
-    overflow: visible;
-    display: block;
-    font-size: 6rem;
-    fill: #ffffff;
-    font-weight: 700;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    line-height: 1;
-  }
-  .curved-loop-jacket {
-    width: 100%;
-    overflow: hidden;
-    user-select: none;
-  }
-  
-  .curved-loop-svg {
-    width: 100%;
-    height: 120px;
-  }
+/* Curved Loop Container */
+.curved-loop-container {
+  width: 100%;
+  overflow: hidden;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  position: relative;
+  will-change: transform;
+  transform: translateZ(0);
+}
 
-  .curved-loop-jacket {
-    width: 100%;
-    overflow: hidden;
-    user-select: none;
-    margin: 0;
-    padding: 0;
-    line-height: 0;
-  }
-  
+/* SVG Styling */
+.curved-loop-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  overflow: visible;
+}
+
+/* Text default styles applied to text elements in SVG */
+.curved-loop-svg text {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  fill: #ffffff;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: filter 0.28s ease, transform 0.28s ease;
+}
+
+/* Responsive minimum heights to keep curve visible on small screens */
+@media (max-width: 1024px) {
   .curved-loop-svg {
-    display: block;
-    width: 100%;
-    height: 120px;
-    margin: 0;
-    padding: 0;
-    line-height: 0;
+    min-height: 320px;
   }
-  
+}
+
+@media (max-width: 640px) {
+  .curved-loop-svg {
+    min-height: 300px;
+  }
+}
+
+/* Hover glow */
+.curved-loop-container:hover .curved-loop-svg text {
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 36px rgba(255, 255, 255, 0.12))
+    drop-shadow(0 0 96px rgba(168, 85, 247, 0.25));
+}
+
+/* Make sure measure text doesn't affect layout */
+.curved-loop-measure {
+  pointer-events: none;
+  shape-rendering: geometricPrecision;
+}
