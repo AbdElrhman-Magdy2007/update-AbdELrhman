@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import CurvedLoop from "./CurvedLoop";
 import ScrollStack from "./ScrollStack";
 import type { Variants } from "framer-motion";
+import { Brush, Cog, Globe } from "lucide-react"; // ✅ Lucide Icons
 
 const ParticleBackground = () => {
   const COLORS = ["#5D5FEF", "#EFA6BE", "#F96A6A"];
@@ -23,8 +24,6 @@ const ParticleBackground = () => {
       })),
     []
   );
-
-
 
 
   const particleVariants: Variants & { [key: string]: any } = {
@@ -232,7 +231,7 @@ const Card = ({ title, description, index, icon, gradient }: CardProps) => {
           </div>
 
           {/* Bottom Section - Content Area */}
-          <div className="h-48 p-6 relative">
+          <div className="h-58 p-6 relative">
 
             {/* Content Background */}
             <div className={`absolute inset-0 bg-gradient-to-t ${gradient} opacity-15 rounded-b-[2rem]`} />
@@ -323,24 +322,24 @@ const About = () => {
 
   const cards = [
     {
-      title: "Stunning UI That Speaks Design",
+      title: "Frontend Development",
       description:
-        "I craft pixel-perfect, responsive interfaces that captivate users and drive engagement. Using cutting-edge technologies like Tailwind CSS and Framer Motion, every interaction feels smooth, intuitive, and professionally polished.",
-      icon: "🎨",
+        "Your website is the first impression — let’s make it unforgettable I create modern, responsive, and fast interfaces with React.js, Next.js, and Tailwind CSS, delivering stunning designs and smooth user experiences.",
+      icon: "🖌️",
       gradient: "from-purple-500 via-pink-500 to-red-500"
     },
     {
-      title: "Fast, Clean & Scalable Code",
+      title: "Backend Development",
       description:
-        "I build high-performance websites using React, Next.js, and TypeScript —with clean code that’s made to scale and last.",
-      icon: "⚡",
+        "Great experiences need powerful foundations I build secure and scalable backends using Node.js, Prisma, and PostgreSQL, with seamless API & payment integrations for reliable performance.",
+      icon: "⚙️",
       gradient: "from-blue-500 via-cyan-500 to-teal-500"
     },
     {
-      title: "Full-Stack Power You Can Trust",
+      title: "Full-Stack Solutionst",
       description:
-        "I deliver complete web solutions with robust backends, secure APIs, and seamless integrations. From database design to payment processing, I handle every aspect with precision and reliability.",
-      icon: "🚀",
+        "From concept to launch — I handle it all I deliver end-to-end web solutions, combining elegant frontends with robust backends for SaaS platforms, eCommerce, and custom dashboards.",
+      icon: "🌐",
       gradient: "from-green-500 via-emerald-500 to-blue-500"
     },
   ];
@@ -359,21 +358,19 @@ const About = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
-   <CurvedLoop
-        marqueeText="Clean Code ✦ Fast Delivery ✦ Modern UI ✦ Scalable Apps ✦ High Performance ✦ Real Results"
-        speed={1.6}
-        curveAmount={300}
-        direction="left"
-        interactive
-        gradient={["#818cf8", "#a855f7"]}
-        className="py-6 font-sans text-base sm:text-lg md:text-xl lg:text-2xl leading-tight tracking-wide"
-        minHeight={420}
-      />
+        <CurvedLoop
+          marqueeText="Clean Code ✦ Fast Delivery ✦ Modern UI ✦ Scalable Apps ✦ High Performance ✦ Real Results"
+          speed={1.6}
+          curveAmount={300}
+          direction="left"
+          interactive
+          gradient={["#818cf8", "#a855f7"]}
+          className="py-6 font-sans text-base sm:text-lg md:text-xl lg:text-2xl leading-tight tracking-wide"
+          minHeight={420}
+        />
 
         <ScrollStack
-          className="w-full pt-40"
-          animationIntensity="normal"
-          smoothScrolling={true}
+          className="w-full pt-80"
         >
           {cards.map((card, index) => (
             <Card
