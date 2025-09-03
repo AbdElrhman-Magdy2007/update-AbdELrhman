@@ -31,7 +31,7 @@ const Logo: React.FC = () => {
     >
       <h1 className="flex items-center md:text-3xl text-xl font-extrabold font-heading tracking-tight select-none">
         <img
-          src="https://i.postimg.cc/Dymv0Nw8/Abd-ELrhman.png"
+          src="https://i.postimg.cc/yxQgP74Q/Abd-ELrhman.png"
           className="w-12 h-12 md:w-16 md:h-16 rounded-full shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:shadow-2xl object-cover bg-indigo-600"
           alt="Abdelrahman Logo"
         />
